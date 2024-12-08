@@ -1,14 +1,26 @@
 //TODO: add error context instead of console log
+import type { GeoJsonProperties } from 'geojson';
 
 // Applies default styles, alongside determining the proper color for each cell
-const calculateChoroplethStyle = ((currentCellValue: number, maxMapValue: number, minMapValue: number) => {
+const calculateChoroplethStyle = ((featureProperties: GeoJsonProperties, maxMapValue: number, minMapValue: number, selectedFeatureID: number | null) => {
+    const fillColor = calculateRedBlueIntervalColor(featureProperties!.population, maxMapValue, minMapValue);
+    let fillOpacity = 0.5;
+    let dashArray= '2';
+    let weight = 1;
+    // If this is the selected feature, its style should be more emphasized
+    if (selectedFeatureID && featureProperties?.id && featureProperties.id == selectedFeatureID) {
+        fillOpacity = 1;
+         dashArray = '0';
+         weight = 2;
+    }
+
     return ({
-        fillColor: calculateRedBlueIntervalColor(currentCellValue, maxMapValue, minMapValue),
-        weight: 1,
+        fillColor: fillColor,
+        weight: weight,
         opacity: 1,
         color: 'white',
-        dashArray: '2',
-        fillOpacity: 0.5
+        dashArray: dashArray,
+        fillOpacity: fillOpacity
     });
 });
 

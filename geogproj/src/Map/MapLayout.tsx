@@ -3,8 +3,9 @@ import { useEffect, useState } from 'react'
 import { MapContainer, TileLayer, useMap, GeoJSON } from 'react-leaflet';
 import type { FeatureCollection } from 'geojson';
 import CountyBorders from '../assets/NebraskaCounties.json';
-import calculateChoroplethStyle from '../Helpers/StyleHelper';
 import populatePopulation from '../Helpers/CensusDataHelper';
+import MapFrame from './MapFrame';
+import Legend from './Legend';
 
 function Map() {
     const [error, setError] = useState<string>(null);
@@ -12,7 +13,6 @@ function Map() {
     const [minValue, setMinValue] = useState<number | null>(null);
     const [numberOfBreaks, setNumberOfBreaks] = useState<number>(5);
     const [geoJSON, setGeoJSON] = useState<FeatureCollection | null>(null);
-    const [data, setData] = useState(null);
 
 
     // Import the population data for each county, and link it to other county data
@@ -45,30 +45,19 @@ function Map() {
     }, [geoJSON, setMaxValue, setMinValue]);
 
 
-    const calculateStyle = (feature => {
-        return calculateChoroplethStyle(feature.properties.population, maxValue, minValue);
-    });
-
     //TODO: Loading
     return (
-        <>
-            <MapContainer
-                style={{ width: '90vw', height: '90vh' }}
-                center={{ lat: 41.5, lng: -100 }}
-                zoom={7}
-            >
-                <TileLayer
-                    attribution="Map tiles by Carto, under CC BY 3.0. Data by OpenStreetMap, under ODbL."
-                    url="https://cartodb-basemaps-{s}.global.ssl.fastly.net/dark_all/{z}/{x}/{y}.png"
-                />
-                <GeoJSON
-                    key={JSON.stringify(geoJSON)}
-                    data={geoJSON}
-                    style={calculateStyle}
-                >
-                </GeoJSON>
-            </MapContainer>
-        </>
+        <div style={{display:'flex'}}>
+            <Legend
+                minValue={minValue!}
+                maxValue={maxValue!}
+            />
+            <MapFrame
+                featureCollection={geoJSON!}
+                minValue={minValue!}
+                maxValue={maxValue!}
+            />
+        </div>
     )
 }
 

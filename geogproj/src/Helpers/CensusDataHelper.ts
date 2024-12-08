@@ -4,37 +4,36 @@
 // (yes pun intended)
 const populatePopulation = async (feature: Feature) => {
     const countyCode = feature.id as number - 31000;
-    const population = await getPopulationDemo(31, countyCode);
-    feature.properties.population = population;
+    await getPopulation(31, countyCode).then(population => {
+        feature.properties.population = population;
+    });
     return feature;
 };
 
 
-function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
+//TODO: UseMemo?? Or some kind of cache
+const getPopulation = async (nStateCode: number, nCountyCode: number) => {
+    let sCountyCode = nCountyCode.toString();
+    // We must append zeros to the county code until it is exactly three characters
+    while (sCountyCode.length < 3) {
+        sCountyCode = `0${sCountyCode}`;
+    }
+    const URL = `https://api.census.gov/data/2019/pep/charagegroups?get=NAME,POP&for=county:${sCountyCode}&in=state:${nStateCode}`;
 
-const getPopulationDemo = async (nStateCode: number, nCountyCode: number) => {
-    await sleep(1000);
-    return Math.floor(Math.random() * 3)
+    try {
+        let population: number;
+        await fetch(URL)
+            .then(response => {
+                if (response.ok) return response.json();
+                    else throw new Error(response.status.toString());
+            })
+            .then(data => {
+                population = Number(data[1][1])// The data will be a matrix, and this is the location which contains population statistics
+            });
+        return population;
+    } catch (error) {
+        console.error('Error fetching data:', error);
+    }
 };
-
-//const getPopulation = ((nStateCode: number, nCountyCode: number) => {
-//    let sCountyCode = nCountyCode.toString();
-//    // We must append zeros to the county code until it is exactly three characters
-//    while (sCountyCode.length < 0) {
-//        sCountyCode = `0${sCountyCode}`;
-//    }
-//    const URL = `https://api.census.gov/data/2019/pep/charagegroups?get=NAME,POP&for=county:${sCountyCode}&in=state:${nStateCode}`;
-
-//    try {
-//        const response =  fetch(URL);
-//        const jsonData = response.json();
-//        return Math.floor(Math.random() * 3)
-//        //return jsonData;
-//    } catch (error) {
-//        console.error('Error fetching data:', error);
-//    }
-//});
 
 export default populatePopulation
