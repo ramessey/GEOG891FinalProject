@@ -1,3 +1,5 @@
+import type { Feature } from 'geojson';
+
 
 // Retreive the census population data for a particular feature
 // Use this data to populate the proper population property of that feature
@@ -5,16 +7,16 @@
 const populatePopulation = async (feature: Feature, year: number) => {
     const countyCode = feature.id as number - 31000;
     await getPopulation(31, countyCode, year).then(population => {
-        feature.properties.population = population;
+        feature.properties!.population = population;
     });
     return feature;
 };
 
 
 //For testing other components more quickly
-const getPopulationDemo = async (nStateCode: number, nCountyCode: number, year: number) => {
-    return Math.floor(Math.random() * 100);
-}
+//const getPopulationDemo = async (nStateCode: number, nCountyCode: number, year: number) => {
+//    return Math.floor(Math.random() * 100);
+//}
 
 
 //TODO: UseMemo?? Or some kind of cache

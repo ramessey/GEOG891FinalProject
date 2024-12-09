@@ -2,7 +2,7 @@
   "name": "geogproj",
   "private": true,
   "version": "0.0.0",
-  "homepage": "http://ramessey.com/GEOG891FinalProject/",
+  "homepage": "https://ramessey.com/GEOG891FinalProject/",
   "type": "module",
   "scripts": {
 	"predeploy": "npm run build",

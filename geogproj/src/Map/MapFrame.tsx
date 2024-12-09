@@ -1,5 +1,4 @@
 import 'leaflet/dist/leaflet.css';
-import { useState } from 'react'
 import { MapContainer, TileLayer, GeoJSON } from 'react-leaflet';
 import type { StyleFunction, Layer } from 'leaflet';
 import type { FeatureCollection, Feature, GeoJsonObject } from 'geojson';

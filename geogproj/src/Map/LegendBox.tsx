@@ -1,6 +1,3 @@
-import { calculateChoroplethStyle } from '../Helpers/StyleHelper';
-
-
 interface LegendBoxProps {
     label: string;
     color: string;
