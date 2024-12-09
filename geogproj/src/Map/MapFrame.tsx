@@ -3,43 +3,43 @@ import { useState } from 'react'
 import { MapContainer, TileLayer, GeoJSON } from 'react-leaflet';
 import type { StyleFunction, Layer } from 'leaflet';
 import type { FeatureCollection, Feature, GeoJsonObject } from 'geojson';
-import calculateChoroplethStyle from '../Helpers/StyleHelper';
+import { calculateChoroplethFillColor } from '../Helpers/StyleHelper';
 
 
 interface MapFrameProps {
     featureCollection: FeatureCollection;
-    maxValue: number;
-    minValue: number;
+    breaks: number[];
+    breakSchema: string;
 }
 
 
 function MapFrame(props: MapFrameProps) {
-    const [popupFeature, setPopupFeature] = useState<Feature | null>(null);
 
 
     const calculateStyle = ((feature: Feature) => {
-        return calculateChoroplethStyle(feature.properties, props.maxValue!, props.minValue!, popupFeature?.properties?.id);
+        return {
+            weight: 2,
+            fillOpacity: 1,
+            fillColor: calculateChoroplethFillColor(feature.properties!.population, props.breaks, props.breakSchema),
+            color: 'white'
+        }
+        //return calculateChoroplethStyle(feature.properties, props.maxValue!, props.minValue!, popupFeature?.properties?.id);
     });
 
 
     const onEachFeature = ((feature: Feature, layer: Layer) => {
-        //if (feature.properties) {
         layer.bindPopup(`${feature.properties!.name} County, population ${feature.properties!.population}`)
-        //}
-        layer.on('click', () => { setPopupFeature(feature) });
-        //layer.on
-        //    ({
-        //       click: setPopupFeature(popupFeature)
-        //    //mouseover: onMouseOver,
-        //    //mouseout: onMouseOut,
-        //});
+        //layer.on('click', () => { setPopupFeature(feature) });
     });
 
 
     return (
         <>
             <MapContainer
-                style={{ width: '70vw', height: '70vh', display: 'inline-block' }}
+                style={{
+                    width: "85%",
+                    display: 'inline-block'
+                }}
                 center={{ lat: 41.5, lng: -100 }}
                 zoom={7}
                 doubleClickZoom={false}
@@ -54,7 +54,7 @@ function MapFrame(props: MapFrameProps) {
                     url="https://cartodb-basemaps-{s}.global.ssl.fastly.net/dark_all/{z}/{x}/{y}.png"
                 />
                 <GeoJSON
-                    key={`${popupFeature?.id}|${JSON.stringify(props.featureCollection)}`}
+                    key={JSON.stringify(props.featureCollection)}
                     data={props.featureCollection as GeoJsonObject}
                     style={calculateStyle as StyleFunction}
                     onEachFeature={(feature, layer) => onEachFeature(feature,layer)}

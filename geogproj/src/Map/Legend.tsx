@@ -1,34 +1,28 @@
-import 'leaflet/dist/leaflet.css';
-import { useState } from 'react'
-import { MapContainer, TileLayer, GeoJSON } from 'react-leaflet';
+import LegendBox  from './LegendBox';
+import { calculateRedBlueIntervalColor } from '../Helpers/StyleHelper';
+
 
 
 interface LegendProps {
-    maxValue: number;
-    minValue: number;
+    breaks: number[];
+    breakSchema: string;
 }
 
 
-function MapFrame(props: LegendProps) {
+function Legend(props: LegendProps) {
 
-    return (
-        <div style={{
-            backgroundImage: 'linear-gradient(#ff0000,#0000ff)',
-            height: '70vh',
-            width: '10vw',
-            display: 'flex',
-            flexDirection:'column',
-            justifyContent: 'space-between',
-            fontWeight: 'bold'
-        }}>
-            <p>
-                {`${props.maxValue} yrs`}
-            </p>
-            <p>
-                {`${props.minValue} yrs`}
-            </p>
-        </div>
-    )
+    return (<div style={{
+        width: "15%",
+        display:'flex',
+        flexDirection:'column-reverse',
+        justifyContent: 'space-between',
+    }}>
+        {props.breaks.map((value, i) => <LegendBox
+            // If the label corresponds to the whole numbrer divisor, don't label it as though it were a range
+            label={(props.breakSchema == "Greatest Divisor" ? "" : "<= ") + value.toString()}
+            color={calculateRedBlueIntervalColor(i,props.breaks.length-1,0)}
+        />)}
+    </div>);
 }
 
-export default MapFrame
+export default Legend
